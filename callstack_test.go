@@ -14,7 +14,7 @@ func X() failure.CallStack {
 func TestCallers(t *testing.T) {
 	fs := X().Frames()
 
-	shouldContain(t, fs[0].Path(), "github.com/morikuni/failure/callstack_test.go")
+	shouldContain(t, fs[0].Path(), "github.com/morikuni/failure/callstack_test.go") // 文件所处的位置
 	shouldContain(t, fs[0].File(), "callstack_test.go")
 	shouldEqual(t, fs[0].Func(), "X")
 	shouldEqual(t, fs[0].Line(), 11)

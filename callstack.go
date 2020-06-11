@@ -34,12 +34,15 @@ func (cs callStack) HeadFrame() Frame {
 }
 
 func (cs callStack) Frames() []Frame {
+	// 栈的层数为0
 	if len(cs.pcs) == 0 {
 		return nil
 	}
 
+	// 解析调用栈
 	rfs := runtime.CallersFrames(cs.pcs)
 
+	// 处理每一个栈帧
 	fs := make([]Frame, 0, len(cs.pcs))
 	for {
 		f, more := rfs.Next()
@@ -88,6 +91,7 @@ func NewCallStack(pcs []uintptr) CallStack {
 // Callers returns a call stack for the current state.
 func Callers(skip int) CallStack {
 	var pcs [32]uintptr
+	// 返回除了自己的函数调用栈
 	n := runtime.Callers(skip+2, pcs[:])
 	if n == 0 {
 		return nil
