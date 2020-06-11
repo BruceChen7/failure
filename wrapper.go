@@ -45,9 +45,11 @@ var _ = []Wrapper{
 	Message(""),
 }
 
+// 函数指针
 // WrapperFunc is an adaptor to use function as the Wrapper interface.
 type WrapperFunc func(err error) error
 
+// 函数指针实现Wrapper接口
 // WrapError implements the Wrapper interface.
 func (f WrapperFunc) WrapError(err error) error {
 	return f(err)
@@ -133,6 +135,7 @@ func (c Context) WrapError(err error) error {
 	for k := range c {
 		keys = append(keys, k)
 	}
+	// 对key进行排序， 按照从小到大排序
 	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
 
 	buf := &bytes.Buffer{}
@@ -141,14 +144,16 @@ func (c Context) WrapError(err error) error {
 		if buf.Len() != 0 {
 			buf.WriteRune(' ')
 		}
+		// 格式化错误信息
 		fmt.Fprintf(buf, "%s=%s", k, v)
 	}
 	return &withContext{c, buf.String(), err}
 }
 
 type withContext struct {
-	ctx        Context
-	memo       string
+	ctx  Context
+	memo string
+	// 最根本的错误
 	underlying error
 }
 
@@ -255,6 +260,7 @@ func WithFormatter() Wrapper {
 }
 
 type formatter struct {
+	// 本身是一个error
 	error
 }
 
@@ -264,6 +270,7 @@ func (f *formatter) UnwrapError() error {
 }
 
 func (f *formatter) Unwrap() error {
+	//
 	return f.error
 }
 

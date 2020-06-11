@@ -21,6 +21,7 @@ func (i *Iterator) Next() bool {
 	return true
 }
 
+// 解开wrapper
 func (i *Iterator) unwrapError() error {
 	type causer interface {
 		Cause() error
@@ -30,6 +31,7 @@ func (i *Iterator) unwrapError() error {
 	}
 
 	switch t := i.err.(type) {
+	// 适用于go1.13的类型处理
 	case go113error:
 		return t.Unwrap()
 	case Unwrapper:

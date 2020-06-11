@@ -14,11 +14,12 @@ type Failure interface {
 }
 
 // CodeOf extracts an error code from the err.
+// 从错误中获取错误码
 func CodeOf(err error) (Code, bool) {
 	if err == nil {
 		return nil, false
 	}
-
+	// 创建一个迭代器
 	i := NewIterator(err)
 	for i.Next() {
 		if noCode, ok := i.Error().(interface{ NoCode() bool }); ok && noCode.NoCode() {
@@ -48,6 +49,7 @@ func Translate(err error, code Code, wrappers ...Wrapper) error {
 
 // Wrap wraps err with given wrappers, and automatically add
 // call stack and formatter.
+// 包裹错误
 func Wrap(err error, wrappers ...Wrapper) error {
 	return Custom(Custom(err, wrappers...), WithFormatter(), WithCallStackSkip(1))
 }
@@ -61,10 +63,12 @@ func MarkUnexpected(err error, wrappers ...Wrapper) error {
 
 // Custom is the general error wrapping constructor.
 // It just wraps err with given wrappers.
+// 都是返回error类型
 func Custom(err error, wrappers ...Wrapper) error {
 	if err == nil {
 		return nil
 	}
+	// 层层包裹错误
 	// To process from left to right, iterate from the last one.
 	// Custom(errors.New("foo"), Message("aaa"), Message("bbb")) should be "aaa: bbb: foo".
 	for i := len(wrappers) - 1; i >= 0; i-- {
@@ -96,14 +100,18 @@ func NewFailure(code Code) Failure {
 // WithCode appends code to an error.
 // You don't have to use this directly, unless using function Custom.
 // Basically, you can use function Translate instead of this.
+
+// Wrapper是是一个interface, 也产生一个Wrapper，这样可以在Cunstom的构造函数中使用
 func WithCode(code Code) Wrapper {
+	// 强制转换为一个函数指针
 	return WrapperFunc(func(err error) error {
 		return &withCode{code, err}
 	})
 }
 
 type withCode struct {
-	code       Code
+	code Code
+	// 底层的error
 	underlying error
 }
 

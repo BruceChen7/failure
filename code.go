@@ -5,7 +5,7 @@ func Is(err error, codes ...Code) bool {
 	if len(codes) == 0 {
 		return false
 	}
-
+	// extract err code
 	c, ok := CodeOf(err)
 	if !ok {
 		// continue process (don't return) to accept the case Is(err, nil).
@@ -13,6 +13,7 @@ func Is(err error, codes ...Code) bool {
 	}
 
 	for i := range codes {
+		// 比较code之间是否相等
 		if c == codes[i] {
 			return true
 		}

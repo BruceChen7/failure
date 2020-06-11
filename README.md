@@ -85,12 +85,14 @@ func GetACL(projectID, userID string) (acl interface{}, e error) {
 func GetProject(projectID, userID string) (project interface{}, e error) {
 	_, err := GetACL(projectID, userID)
 	if err != nil {
+		// 是找不到的错误码
 		if failure.Is(err, NotFound) {
 			return nil, failure.Translate(err, Forbidden,
 				failure.Message("no acl exists"),
 				failure.Context{"additional_info": "hello"},
 			)
 		}
+		// 包裹错误
 		return nil, failure.Wrap(err)
 	}
 	return nil, nil
@@ -110,10 +112,13 @@ func getHTTPStatus(err error) int {
 		return http.StatusInternalServerError
 	}
 	switch c {
+    // 404
 	case NotFound:
 		return http.StatusNotFound
+	// 403
 	case Forbidden:
 		return http.StatusForbidden
+    // 502
 	default:
 		return http.StatusInternalServerError
 	}
@@ -128,6 +133,7 @@ func getMessage(err error) string {
 }
 
 func HandleError(w http.ResponseWriter, err error) {
+	// 写状态码
 	w.WriteHeader(getHTTPStatus(err))
 	io.WriteString(w, getMessage(err))
 
