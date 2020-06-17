@@ -73,6 +73,7 @@ func Messagef(format string, args ...interface{}) Message {
 	return Message(fmt.Sprintf(format, args...))
 }
 
+// 给错误添加信息
 type withMessage struct {
 	message    Message
 	underlying error
@@ -84,6 +85,7 @@ func (w *withMessage) Error() string {
 
 // Deprecated: This function will be deleted in v1.0.0 release. Please use Unwrap.
 func (w *withMessage) UnwrapError() error {
+	// 返回包含的error
 	return w.Unwrap()
 }
 
@@ -196,10 +198,12 @@ func WithCallStackSkip(skip int) Wrapper {
 }
 
 type withCallStack struct {
+	// 调用栈
 	callStack  CallStack
 	underlying error
 }
 
+// 实现了erros
 func (w *withCallStack) Error() string {
 	head := w.callStack.HeadFrame()
 	return fmt.Sprintf("%s.%s: %s", head.Pkg(), head.Func(), w.underlying)

@@ -19,14 +19,18 @@ func CodeOf(err error) (Code, bool) {
 	if err == nil {
 		return nil, false
 	}
-	// 创建一个迭代器
+	// 创建一个迭代器，实际上也就是一个error
+	// 向下迭代error
 	i := NewIterator(err)
 	for i.Next() {
+
+		// 实现了NoCode
 		if noCode, ok := i.Error().(interface{ NoCode() bool }); ok && noCode.NoCode() {
 			return nil, false
 		}
 
 		var c Code
+		// 普通的error也实现了As，那么返回对应的凑到
 		if i.As(&c) {
 			return c, true
 		}
@@ -101,7 +105,7 @@ func NewFailure(code Code) Failure {
 // You don't have to use this directly, unless using function Custom.
 // Basically, you can use function Translate instead of this.
 
-// Wrapper是是一个interface, 也产生一个Wrapper，这样可以在Cunstom的构造函数中使用
+// Wrapper是一个interface, 也产生一个Wrapper，这样可以在Cunstom的构造函数中使用
 func WithCode(code Code) Wrapper {
 	// 强制转换为一个函数指针
 	return WrapperFunc(func(err error) error {
